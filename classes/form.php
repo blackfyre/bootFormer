@@ -8,21 +8,19 @@
 
 namespace blackfyre\bootFormer;
 
+
 /**
- *
- */
-/**
- *
+ * bootFormer layout option
  */
 define('_BOOTFORMER_LAYOUT_NORMAL', 0);
 /**
- *
+ * bootFormer layout option
  */
 define('_BOOTFORMER_LAYOUT_INLINE', 1);
 /**
- *
+ * bootFormer layout option
  */
-define('_BOOTFORMER_LAYOUT_HORIZONTAL', 3);
+define('_BOOTFORMER_LAYOUT_HORIZONTAL', 2);
 
 /**
  * Class formHandler
