@@ -8,10 +8,26 @@
 
 namespace blackfyre\bootFormer;
 
-define('_BOOTFORMER_LAYOUT_NORMAL',0);
-define('_BOOTFORMER_LAYOUT_INLINE',1);
-define('_BOOTFORMER_LAYOUT_HORIZONTAL',3);
+/**
+ *
+ */
+/**
+ *
+ */
+define('_BOOTFORMER_LAYOUT_NORMAL', 0);
+/**
+ *
+ */
+define('_BOOTFORMER_LAYOUT_INLINE', 1);
+/**
+ *
+ */
+define('_BOOTFORMER_LAYOUT_HORIZONTAL', 3);
 
+/**
+ * Class formHandler
+ * @package blackfyre\bootFormer
+ */
 class formHandler
 {
 
@@ -57,7 +73,8 @@ class formHandler
     /**
      * @param int $layout
      */
-    function setFormLayout($layout = _BOOTFORMER_LAYOUT_HORIZONTAL) {
+    function setFormLayout($layout = _BOOTFORMER_LAYOUT_HORIZONTAL)
+    {
         $this->formLayout = $layout;
     }
 
@@ -65,7 +82,8 @@ class formHandler
     /**
      * @param string $ratio
      */
-    function setFormRatio($ratio = '2:10') {
+    function setFormRatio($ratio = '2:10')
+    {
         $this->formRatio = $ratio;
     }
 
@@ -74,9 +92,10 @@ class formHandler
      * Set the form mode to get or post
      * @param string $mode
      */
-    function setFormMode($mode='post') {
+    function setFormMode($mode = 'post')
+    {
 
-        if ($mode!='post' AND $mode!='get') {
+        if ($mode != 'post' AND $mode != 'get') {
             $mode = 'post';
         }
 
@@ -86,7 +105,8 @@ class formHandler
     /**
      * @param string $btnClass
      */
-    function setSubmitStyle($btnClass = 'primary') {
+    function setSubmitStyle($btnClass = 'primary')
+    {
         $this->submitStyle = $btnClass;
     }
 
@@ -94,7 +114,8 @@ class formHandler
      * Set submit target
      * @param null $target
      */
-    function setSubmitTarget($target = null) {
+    function setSubmitTarget($target = null)
+    {
         if (is_string($target)) {
             $this->submitTarget = $target;
         }
@@ -105,7 +126,8 @@ class formHandler
      * Reset the form class variables to their default values
      * return void
      */
-    private function resetForm() {
+    private function resetForm()
+    {
         $this->setFormLayout();
         $this->setFormRatio();
     }
@@ -114,7 +136,8 @@ class formHandler
      * Clear the postBack if there's no re-post set
      * @param bool $force
      */
-    function clearPostBack($force = false) {
+    function clearPostBack($force = false)
+    {
         if (isset($_SESSION['postBack']) and !isset($_SESSION['postBack']['repost'])) {
             unset($_SESSION['postBack']);
         }
@@ -129,10 +152,12 @@ class formHandler
      *
      * @return bool
      */
-    function postBack($data = null) {
+    function postBack($data = null)
+    {
         if (is_array($data)) {
-            $_SESSION['postBack'] = $data;
+            $_SESSION['postBack']           = $data;
             $_SESSION['postBack']['repost'] = true;
+
             return true;
         }
 
@@ -148,8 +173,10 @@ class formHandler
      * @param null|array $data
      * @return null
      */
-    function cleanUpData($data = null) {
-        unset($data['editForm'],$data['repost']);
+    function cleanUpData($data = null)
+    {
+        unset($data['editForm'], $data['repost']);
+
         return $data;
     }
 
@@ -162,6 +189,7 @@ class formHandler
     static function cleanVar($variable)
     {
         $variable = htmlspecialchars(trim(stripcslashes(strip_tags($variable))), ENT_QUOTES);
+
         return $variable;
     }
 
@@ -176,6 +204,7 @@ class formHandler
     {
         $var = strip_tags($var, '<h1><h2><h3><h4><h5><h6><br><b><string><ul><ol><li><a><i><em><pre><table><tbody><thead><tfoor><th><tr><td><p><div><img><iframe><sub><sup><strong><span><hr>');
         $var = htmlspecialchars($var, ENT_QUOTES);
+
         return $var;
     }
 
@@ -203,8 +232,8 @@ class formHandler
         foreach ($data as $key => $value) {
 
             $dataTypeAndKey = explode('-', $key);
-            $dataType = $dataTypeAndKey[0];
-            $dataKey = $dataTypeAndKey[1];
+            $dataType       = $dataTypeAndKey[0];
+            $dataKey        = $dataTypeAndKey[1];
 
             if ($dataType != 'submit') {
                 switch ($dataType) {
@@ -248,9 +277,9 @@ class formHandler
         }
 
 
-        if (isset($_FILES) AND count($_FILES)>0) {
+        if (isset($_FILES) AND count($_FILES) > 0) {
 
-            $returnArray = array_merge($returnArray,$this->handleFileUpload());
+            $returnArray = array_merge($returnArray, $this->handleFileUpload());
         }
 
         return $returnArray;
@@ -259,10 +288,11 @@ class formHandler
     /**
      * @return null|array
      */
-    private function handleFileUpload() {
+    private function handleFileUpload()
+    {
         $result = null;
 
-        foreach ($_FILES AS $key=>$f) {
+        foreach ($_FILES AS $key => $f) {
             $ext = pathinfo($f['name'], PATHINFO_EXTENSION);
             $ext = strtolower($ext);
 
@@ -285,7 +315,7 @@ class formHandler
 
             }
 
-            $key = explode('-',$key);
+            $key             = explode('-', $key);
             $result[$key[1]] = $output;
         }
 
@@ -314,10 +344,10 @@ class formHandler
 
             if (isset($dataTypeAndKey[1])) {
                 $dataType = $dataTypeAndKey[0];
-                $dataKey = $dataTypeAndKey[1];
+                $dataKey  = $dataTypeAndKey[1];
             } else {
                 $dataType = $dataTypeAndKey[0];
-                $dataKey = $dataTypeAndKey[0];
+                $dataKey  = $dataTypeAndKey[0];
             }
 
 
@@ -336,8 +366,8 @@ class formHandler
                         $returnArray[$dataType . '-' . $dataKey] = filter_var($data, FILTER_SANITIZE_NUMBER_INT);
                         break;
                     case 'phone':
-                        $sanitize = filter_var($data, FILTER_SANITIZE_NUMBER_INT);
-                        $sanitize = str_replace(array('+', '-', '/'), '', $sanitize);
+                        $sanitize                                = filter_var($data, FILTER_SANITIZE_NUMBER_INT);
+                        $sanitize                                = str_replace(array('+', '-', '/'), '', $sanitize);
                         $returnArray[$dataType . '-' . $dataKey] = $sanitize;
                         break;
                     case 'checklist':
@@ -406,6 +436,7 @@ class formHandler
             }
 
             unset($_SESSION['lastFormInputs']);
+
             return $valid;
 
         } else {
@@ -428,10 +459,10 @@ class formHandler
 
         $input['type'] = $inputType;
         $input['name'] = $inputType . '-' . $inputName;
-        $input['id'] = $input['name'];
+        $input['id']   = $input['name'];
 
-        $input['value'] = (isset($attributes['value'])?$attributes['value']:null);
-        $input['label'] = (isset($attributes['label'])?$attributes['label']:null);
+        $input['value'] = (isset($attributes['value']) ? $attributes['value'] : null);
+        $input['label'] = (isset($attributes['label']) ? $attributes['label'] : null);
 
 
         if ($inputType != 'dropdownList' AND $inputType != 'checkBox') {
@@ -439,8 +470,8 @@ class formHandler
         }
 
 
-        foreach ($attributes AS $k=>$v) {
-                $input[$k] = $v;
+        foreach ($attributes AS $k => $v) {
+            $input[$k] = $v;
         }
 
 
@@ -449,38 +480,49 @@ class formHandler
         $this->elements[] = $input;
     }
 
-    private function hasCSSClass($needle, $haystack) {
-        $haystack = explode(' ',$haystack);
+    /**
+     * @param $needle
+     * @param $haystack
+     * @return bool
+     */
+    private function hasCSSClass($needle, $haystack)
+    {
+        $haystack = explode(' ', $haystack);
 
-        if (in_array($needle,$haystack)) {
+        if (in_array($needle, $haystack)) {
             return true;
         } else {
             return false;
         }
     }
 
-    private function parseAttributes($attributes = array()) {
-        $ignoredAttributes = array('type','label','prepend','append','leftCombo','rightCombo','inline');
+    /**
+     * @param array $attributes
+     * @return string
+     */
+    private function parseAttributes($attributes = array())
+    {
+        $ignoredAttributes = array('type', 'label', 'prepend', 'append', 'leftCombo', 'rightCombo', 'inline');
         $booleanAttributes = array('disabled', 'readonly', 'multiple', 'checked', 'required', 'autofocus');
 
-        $ignoreValueTypes = array('select','textarea');
+        $ignoreValueTypes = array('select', 'textarea');
 
-        $ignoreButtons = array('button','submit','reset');
+        $ignoreButtons = array('button', 'submit', 'reset');
 
-        if (in_array($attributes['type'],$ignoreValueTypes)) {
+        if (in_array($attributes['type'], $ignoreValueTypes)) {
             $ignoredAttributes[] = 'value';
         }
 
-        if (!isset($attributes['class']) AND !in_array($attributes['type'],$ignoreButtons)) {
+        if (!isset($attributes['class']) AND !in_array($attributes['type'], $ignoreButtons)) {
             $attributes['class'] = 'form-control';
         }
 
         $stringToRender = array();
 
-        foreach ($attributes AS $k=>$v) {
-            if (!in_array($k,$ignoredAttributes)) {
+        foreach ($attributes AS $k => $v) {
+            if (!in_array($k, $ignoredAttributes)) {
 
-                if (in_array($k,$booleanAttributes)) {
+                if (in_array($k, $booleanAttributes)) {
 
                     if ($v === true) {
                         $stringToRender[] = $k;
@@ -493,9 +535,9 @@ class formHandler
                         /*
                          * check the class section for the form-control class, and if missing, add it
                          */
-                        if (!$this->hasCSSClass('form-control',$v) AND !in_array($attributes['type'],$ignoreButtons)) {
+                        if (!$this->hasCSSClass('form-control', $v) AND !in_array($attributes['type'], $ignoreButtons)) {
                             $v = 'form-control ' . $v;
-                        } elseif (!$this->hasCSSClass('btn',$v) AND in_array($attributes['type'],$ignoreButtons)) {
+                        } elseif (!$this->hasCSSClass('btn', $v) AND in_array($attributes['type'], $ignoreButtons)) {
                             $v = 'btn ' . $v;
                         }
 
@@ -514,9 +556,10 @@ class formHandler
      * @param array $elementData
      * @return string
      */
-    private function generalInputElement($elementData = array()) {
+    private function generalInputElement($elementData = array())
+    {
 
-        $ratio = explode(':',$this->formRatio);
+        $ratio = explode(':', $this->formRatio);
 
         /*
          * Create general form group
@@ -527,14 +570,14 @@ class formHandler
          * If the left or right combos are set, add the input-group for stacking
          */
         if (isset($elementData['leftCombo']) || isset($elementData['rightCombo'])) {
-            $r .= '<div class="input-group">'. "\r\n";
+            $r .= '<div class="input-group">' . "\r\n";
 
             /*
              * If the left part is set add it
              */
             if (isset($elementData['leftCombo'])) {
 
-                $r .= '<span class="input-group-addon">' . $elementData['leftCombo'] . '</span>'. "\r\n";
+                $r .= '<span class="input-group-addon">' . $elementData['leftCombo'] . '</span>' . "\r\n";
             }
 
         }
@@ -544,7 +587,7 @@ class formHandler
          */
         if (!is_null($elementData['label']) || $this->formLayout == _BOOTFORMER_LAYOUT_HORIZONTAL) {
 
-            if ($this->formLayout == _BOOTFORMER_LAYOUT_HORIZONTAL AND !in_array($elementData['type'],array('button','reset','submit'))) {
+            if ($this->formLayout == _BOOTFORMER_LAYOUT_HORIZONTAL AND !in_array($elementData['type'], array('button', 'reset', 'submit'))) {
                 if (is_null($elementData['label'])) {
                     $elementData['label'] = 'MISSING';
                 }
@@ -556,7 +599,7 @@ class formHandler
                 $classAdd = 'col-sm-' . $ratio[0] . ' control-label';
             }
 
-            $r .= '<label ' . (!is_null($classAdd)?'class="' . $classAdd . '"':'') . ' for="' . $elementData['id'] . '">'  . $elementData['label'] . '</label>'. "\r\n";
+            $r .= '<label ' . (!is_null($classAdd) ? 'class="' . $classAdd . '"' : '') . ' for="' . $elementData['id'] . '">' . $elementData['label'] . '</label>' . "\r\n";
         }
 
         if ($this->formLayout == _BOOTFORMER_LAYOUT_HORIZONTAL) {
@@ -609,20 +652,25 @@ class formHandler
         return $r;
     }
 
-    function renderSelectOption($element = array()) {
+    /**
+     * @param array $element
+     * @return null|string
+     */
+    function renderSelectOption($element = array())
+    {
         if (!isset($element['value'])) {
             return null;
         }
 
         $r = '<select ' . $this->parseAttributes($element) . '>';
 
-        foreach ($element['value'] AS $k=>$v) {
+        foreach ($element['value'] AS $k => $v) {
 
             if (is_array($v)) {
 
                 $r .= '<optgroup>' . $k . '</optgroup>';
 
-                foreach ($v as $optKey=>$optVal) {
+                foreach ($v as $optKey => $optVal) {
                     $r .= '<option value="' . $optKey . '">' . $optVal . '</option>';
                 }
 
@@ -638,21 +686,42 @@ class formHandler
         return $r;
     }
 
-    function renderButton($element = array()) {
-        return '<button type="' . $element['type'] . '" ' . $this->parseAttributes($element) . '>' . (isset($element['value'])?$element['value']:null) . '</button>';
+    /**
+     * @param array $element
+     * @return string
+     */
+    function renderButton($element = array())
+    {
+        return '<button type="' . $element['type'] . '" ' . $this->parseAttributes($element) . '>' . (isset($element['value']) ? $element['value'] : null) . '</button>';
     }
 
-    function renderSubmit($element = array()) {
+    /**
+     * @param array $element
+     * @return string
+     */
+    function renderSubmit($element = array())
+    {
         $element['class'] = 'btn btn-' . $this->submitStyle;
+
         return $this->renderButton($element);
     }
 
-    function renderReset($element = array()) {
+    /**
+     * @param array $element
+     * @return string
+     */
+    function renderReset($element = array())
+    {
         return $this->renderButton($element);
     }
 
-    function renderTextArea($element = array()) {
-        return '<textarea ' . $this->parseAttributes($element) . '>' . (isset($element['value'])?$element['value']:null) . '</textarea>';
+    /**
+     * @param array $element
+     * @return string
+     */
+    function renderTextArea($element = array())
+    {
+        return '<textarea ' . $this->parseAttributes($element) . '>' . (isset($element['value']) ? $element['value'] : null) . '</textarea>';
     }
 
     /**
@@ -661,7 +730,7 @@ class formHandler
      *
      * @param string $formName
      * @param string $submitText
-     * @param string $submitAdd    Addition code to place next to the Submit button (eg. cancel, reset, ...)
+     * @param string $submitAdd Addition code to place next to the Submit button (eg. cancel, reset, ...)
      *
      * @return bool|string
      */
@@ -671,7 +740,7 @@ class formHandler
 
             $ratio = $this->formRatio;
 
-            $ratio = explode(':',$ratio);
+            $ratio = explode(':', $ratio);
 
             $ratio['label'] = $ratio[0];
             $ratio['input'] = $ratio[1];
@@ -702,7 +771,7 @@ class formHandler
             }
 
             $out = '<form role="form" method="' . $this->mode . '" ';
-            $out .= 'data-async class="' . $layout . '" action="' . (is_null($this->submitTarget)?'':$this->submitTarget) . '" id="form-' . $this->slugger($formName) . '" accept-charset="utf-8" ' . ($this->mode=='post'?'enctype="multipart/form-data"':'')  . '>';
+            $out .= 'data-async class="' . $layout . '" action="' . (is_null($this->submitTarget) ? '' : $this->submitTarget) . '" id="form-' . $this->slugger($formName) . '" accept-charset="utf-8" ' . ($this->mode == 'post' ? 'enctype="multipart/form-data"' : '') . '>';
 
             $out .= $rows;
 
@@ -716,6 +785,7 @@ class formHandler
             return $out;
 
         }
+
         return false;
     }
 
@@ -746,12 +816,12 @@ class formHandler
     }
 
 
-
     /**
      * @param string $toWatch
      * @return bool
      */
-    function watchForm($toWatch = '') {
+    function watchForm($toWatch = '')
+    {
 
         if ($toWatch == '') {
             return false;

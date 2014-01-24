@@ -13,12 +13,13 @@ function formExample() {
 
     $_SESSION['postBack']['textInput1'] = 'nincs';
 
-    $form->setFormLayout(_BOOTFORMER_LAYOUT_HORIZONTAL);
+    $form->setFormLayout(_BOOTFORMER_LAYOUT_NORMAL);
 
     $form->addInput('text','textInput1',array('required'=>true));
     $form->addInput('text','textInput2',array('required'=>true,'label'=>'nincs'));
     $form->addInput('text','textInput3',array('required'=>true,'label'=>'nincs','value'=>'no content'));
     $form->addInput('text','textInput4',array('required'=>true,'label'=>'nincs','placeholder'=>'_PLACEHOLDER'));
+    $form->addInput('text','textInput5',array('required'=>true,'placeholder'=>'_PLACEHOLDER','leftCombo'=>'_LEFT','rightCombo'=>'_RIGHT'));
 
     $selectValues[] = 1;
     $selectValues[] = 2;
