@@ -1,0 +1,21 @@
+{
+    "name": "blackfyre/bootFormer",
+    "description": "Why should frameworks have all the fun? Create bootstrap forms and validate them with php",
+    "homepage"		: "https://github.com/blackfyre/bootFormer",
+    "version"		: "0.1a",
+    "minimum-stability": "stable",
+    "keywords"		: ["form","twitter","bootstrap","input","php"],
+    "license": "GPL v3",
+    "authors": [
+        {
+            "name": "Galicz Miklós",
+            "email": "galicz.miklos@blackworks.org",
+            "role": "Developer",
+            "homepage"	: "http://blackworks.com"
+        }
+    ],
+    "require"		: {
+        "php"				: ">=5.3.0",
+        "twitter/bootstrap"	: ">=3"
+    }
+}
