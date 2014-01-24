@@ -13,7 +13,7 @@ function formExample() {
 
     $_SESSION['postBack']['textInput1'] = 'nincs';
 
-    $form->setFormLayout(_BOOTFORMER_LAYOUT_HORIZONTAL);
+    $form->setFormLayout(_BOOTFORMER_LAYOUT_NORMAL);
 
     $form->addInput('text','textInput1',array('required'=>true));
     $form->addInput('text','textInput2',array('required'=>true,'label'=>'nincs'));
@@ -27,6 +27,9 @@ function formExample() {
 
     $form->addInput('select','select1',array('value'=>$selectValues));
     $form->addInput('select','select2',array('value'=>$selectValues,'multiple'=>true));
+
+    $form->addInput('textarea','textArea1');
+    $form->addInput('textarea','textArea1',array('value'=>'_DEMO_CONTENT'));
 
     return $form->generateForm();
 }

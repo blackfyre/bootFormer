@@ -28,12 +28,6 @@ class formHandler
     private $formRatio = '2:10';
 
     /**
-     * Submit button style
-     * @var string
-     */
-    private $submitStyle = 'primary';
-
-    /**
      * Form submit mode
      * @var string
      */
@@ -146,6 +140,32 @@ class formHandler
     function cleanUpData($data = null) {
         unset($data['editForm'],$data['repost']);
         return $data;
+    }
+
+    /**
+     * Cleans simple string like text, for text input fields
+     *
+     * @param $variable
+     * @return mixed
+     */
+    static function cleanVar($variable)
+    {
+        $variable = htmlspecialchars(trim(stripcslashes(strip_tags($variable))), ENT_QUOTES);
+        return $variable;
+    }
+
+    /**
+     *
+     * A more relaxed cleaner for textareas and wysiwyg editors
+     *
+     * @param string $var
+     * @return string
+     */
+    static function cleanTextField($var)
+    {
+        $var = strip_tags($var, '<h1><h2><h3><h4><h5><h6><br><b><string><ul><ol><li><a><i><em><pre><table><tbody><thead><tfoor><th><tr><td><p><div><img><iframe><sub><sup><strong><span><hr>');
+        $var = htmlspecialchars($var, ENT_QUOTES);
+        return $var;
     }
 
     /**
@@ -292,8 +312,8 @@ class formHandler
 
             if ($dataType != 'submit') {
                 switch ($dataType) {
-                    case 'textArea':
-                        $returnArray[$dataType . '-' . $dataKey] = coreFunctions::cleanTextField($data);
+                    case 'textarea':
+                        $returnArray[$dataType . '-' . $dataKey] = $this->cleanTextField($data);
                         break;
                     case 'email':
                         $returnArray[$dataType . '-' . $dataKey] = filter_var($data, FILTER_SANITIZE_EMAIL);
@@ -316,7 +336,7 @@ class formHandler
                         if (is_array($data)) {
                             $returnArray[$dataType . '-' . $dataKey] = $data;
                         } else {
-                            $returnArray[$dataType . '-' . $dataKey] = coreFunctions::cleanVar($data);
+                            $returnArray[$dataType . '-' . $dataKey] = $this->cleanVar($data);
                         }
                         break;
                 }
@@ -432,7 +452,7 @@ class formHandler
         $ignoredAttributes = array('type','label','prepend','append','leftCombo','rightCombo','inline');
         $booleanAttributes = array('disabled', 'readonly', 'multiple', 'checked', 'required', 'autofocus');
 
-        if ($attributes['type']=='select') {
+        if ($attributes['type']=='select' || $attributes['type']=='textarea') {
             $ignoredAttributes[] = 'value';
         }
 
@@ -540,6 +560,9 @@ class formHandler
                 break;
             case 'radio':
                 break;
+            case 'textarea':
+                $r .= $this->renderTextArea($elementData);
+                break;
         }
 
         if ($this->formLayout == _BOOTFORMER_LAYOUT_HORIZONTAL) {
@@ -587,6 +610,10 @@ class formHandler
         $r .= '</select>';
 
         return $r;
+    }
+
+    function renderTextArea($element = array()) {
+        return '<textarea ' . $this->parseAttributes($element) . '>' . (isset($element['value'])?$element['value']:null) . '</textarea>';
     }
 
     /**
