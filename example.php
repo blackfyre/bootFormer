@@ -20,6 +20,14 @@ function formExample() {
     $form->addInput('text','textInput3',array('required'=>true,'label'=>'nincs','value'=>'no content'));
     $form->addInput('text','textInput4',array('required'=>true,'label'=>'nincs','placeholder'=>'_PLACEHOLDER'));
 
+    $selectValues[] = 1;
+    $selectValues[] = 2;
+    $selectValues[] = 3;
+    $selectValues[] = 4;
+
+    $form->addInput('select','select1',array('value'=>$selectValues));
+    $form->addInput('select','select2',array('value'=>$selectValues,'multiple'=>true));
+
     return $form->generateForm();
 }
 

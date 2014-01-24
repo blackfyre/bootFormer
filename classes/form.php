@@ -429,8 +429,12 @@ class formHandler
     }
 
     private function parseAttributes($attributes = array()) {
-        $ignoredAttributes = array('type','label','prepend','append','leftCombo','rightCombo');
+        $ignoredAttributes = array('type','label','prepend','append','leftCombo','rightCombo','inline');
         $booleanAttributes = array('disabled', 'readonly', 'multiple', 'checked', 'required', 'autofocus');
+
+        if ($attributes['type']=='select') {
+            $ignoredAttributes[] = 'value';
+        }
 
         if (!isset($attributes['class'])) {
             $attributes['class'] = 'form-control';
@@ -443,7 +447,7 @@ class formHandler
 
                 if (in_array($k,$booleanAttributes)) {
 
-                    if ($booleanAttributes === true) {
+                    if ($v === true) {
                         $stringToRender[] = $k;
                     }
 
@@ -486,14 +490,14 @@ class formHandler
          * If the left or right combos are set, add the input-group for stacking
          */
         if (isset($elementData['leftCombo']) || isset($elementData['rightCombo'])) {
-            $r .= '<div class="input-group">';
+            $r .= '<div class="input-group">'. "\r\n";
 
             /*
              * If the left part is set add it
              */
             if (isset($elementData['leftCombo'])) {
 
-                $r .= '<span class="input-group-addon">' . $elementData['leftCombo'] . '</span>';
+                $r .= '<span class="input-group-addon">' . $elementData['leftCombo'] . '</span>'. "\r\n";
             }
 
         }
@@ -515,11 +519,11 @@ class formHandler
                 $classAdd = 'col-sm-' . $ratio[0] . ' control-label';
             }
 
-            $r .= '<label ' . (!is_null($classAdd)?'class="' . $classAdd . '"':'') . ' for="' . $elementData['id'] . '">'  . $elementData['label'] . '</label>';
+            $r .= '<label ' . (!is_null($classAdd)?'class="' . $classAdd . '"':'') . ' for="' . $elementData['id'] . '">'  . $elementData['label'] . '</label>'. "\r\n";
         }
 
         if ($this->formLayout == _BOOTFORMER_LAYOUT_HORIZONTAL) {
-            $r .= '<div class="col-sm-' . $ratio[1] . '">';
+            $r .= '<div class="col-sm-' . $ratio[1] . '">' . "\r\n";
         }
 
         /*
@@ -530,6 +534,7 @@ class formHandler
                 $r .= '<input type="' . $elementData['type'] . '" ' . $this->parseAttributes($elementData) . '>';
                 break;
             case 'select':
+                $r .= $this->renderSelectOption($elementData);
                 break;
             case 'checkbox':
                 break;
@@ -551,6 +556,35 @@ class formHandler
         }
 
         $r .= '</div> <!-- end input group -->' . "\r\n";
+
+        return $r;
+    }
+
+    function renderSelectOption($element = array()) {
+        if (!isset($element['value'])) {
+            return null;
+        }
+
+        $r = '<select ' . $this->parseAttributes($element) . '>';
+
+        foreach ($element['value'] AS $k=>$v) {
+
+            if (is_array($v)) {
+
+                $r .= '<optgroup>' . $k . '</optgroup>';
+
+                foreach ($v as $optKey=>$optVal) {
+                    $r .= '<option value="' . $optKey . '">' . $optVal . '</option>';
+                }
+
+            } else {
+                $r .= '<option value="' . $k . '">' . $v . '</option>';
+            }
+
+
+        }
+
+        $r .= '</select>';
 
         return $r;
     }
