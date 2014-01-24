@@ -164,6 +164,7 @@ pip-log.txt
 
 #phpStorm
 .idea/
+/.idea/
 
 #Hung-Art Source
 hung-art/

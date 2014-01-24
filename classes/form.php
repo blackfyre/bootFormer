@@ -38,6 +38,10 @@ class formHandler
      */
     private $submitTarget = null;
 
+    /**
+     * @var string
+     */
+    private $submitStyle = 'primary';
 
     /**
      * @var null
@@ -77,6 +81,13 @@ class formHandler
         }
 
         $this->mode = $mode;
+    }
+
+    /**
+     * @param string $btnClass
+     */
+    function setSubmitStyle($btnClass = 'primary') {
+        $this->submitStyle = $btnClass;
     }
 
     /**
@@ -452,11 +463,15 @@ class formHandler
         $ignoredAttributes = array('type','label','prepend','append','leftCombo','rightCombo','inline');
         $booleanAttributes = array('disabled', 'readonly', 'multiple', 'checked', 'required', 'autofocus');
 
-        if ($attributes['type']=='select' || $attributes['type']=='textarea') {
+        $ignoreValueTypes = array('select','textarea');
+
+        $ignoreButtons = array('button','submit','reset');
+
+        if (in_array($attributes['type'],$ignoreValueTypes)) {
             $ignoredAttributes[] = 'value';
         }
 
-        if (!isset($attributes['class'])) {
+        if (!isset($attributes['class']) AND !in_array($attributes['type'],$ignoreButtons)) {
             $attributes['class'] = 'form-control';
         }
 
@@ -478,8 +493,10 @@ class formHandler
                         /*
                          * check the class section for the form-control class, and if missing, add it
                          */
-                        if (!$this->hasCSSClass('form-control',$v)) {
+                        if (!$this->hasCSSClass('form-control',$v) AND !in_array($attributes['type'],$ignoreButtons)) {
                             $v = 'form-control ' . $v;
+                        } elseif (!$this->hasCSSClass('btn',$v) AND in_array($attributes['type'],$ignoreButtons)) {
+                            $v = 'btn ' . $v;
                         }
 
                     }
@@ -527,7 +544,7 @@ class formHandler
          */
         if (!is_null($elementData['label']) || $this->formLayout == _BOOTFORMER_LAYOUT_HORIZONTAL) {
 
-            if ($this->formLayout == _BOOTFORMER_LAYOUT_HORIZONTAL) {
+            if ($this->formLayout == _BOOTFORMER_LAYOUT_HORIZONTAL AND !in_array($elementData['type'],array('button','reset','submit'))) {
                 if (is_null($elementData['label'])) {
                     $elementData['label'] = 'MISSING';
                 }
@@ -562,6 +579,15 @@ class formHandler
                 break;
             case 'textarea':
                 $r .= $this->renderTextArea($elementData);
+                break;
+            case 'button':
+                $r .= $this->renderButton($elementData);
+                break;
+            case 'submit':
+                $r .= $this->renderSubmit($elementData);
+                break;
+            case 'reset':
+                $r .= $this->renderReset($elementData);
                 break;
         }
 
@@ -610,6 +636,19 @@ class formHandler
         $r .= '</select>';
 
         return $r;
+    }
+
+    function renderButton($element = array()) {
+        return '<button type="' . $element['type'] . '" ' . $this->parseAttributes($element) . '>' . (isset($element['value'])?$element['value']:null) . '</button>';
+    }
+
+    function renderSubmit($element = array()) {
+        $element['class'] = 'btn btn-' . $this->submitStyle;
+        return $this->renderButton($element);
+    }
+
+    function renderReset($element = array()) {
+        return $this->renderButton($element);
     }
 
     function renderTextArea($element = array()) {
