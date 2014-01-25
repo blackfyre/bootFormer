@@ -153,7 +153,7 @@ class formHandler
     function postBack($data = null)
     {
         if (is_array($data)) {
-            $_SESSION['postBack']           = $data;
+            $_SESSION['postBack'] = $data;
             $_SESSION['postBack']['repost'] = true;
 
             return true;
@@ -230,8 +230,16 @@ class formHandler
         foreach ($data as $key => $value) {
 
             $dataTypeAndKey = explode('-', $key);
-            $dataType       = $dataTypeAndKey[0];
-            $dataKey        = $dataTypeAndKey[1];
+
+            if (count($dataTypeAndKey)==3) {
+                $dataType = $dataTypeAndKey[0] . '-' . $dataTypeAndKey[1];
+                $dataKey = $dataTypeAndKey[2];
+            } else {
+                $dataType = $dataTypeAndKey[0];
+                $dataKey = $dataTypeAndKey[1];
+            }
+
+
 
             if ($dataType != 'submit') {
                 switch ($dataType) {
@@ -242,26 +250,18 @@ class formHandler
                             $returnArray[$dataKey] = false;
                         }
                         break;
-                    case 'textArea':
+                    case 'textarea':
                         if ($value != "") {
                             $returnArray[$dataKey] = $value;
                         } else {
                             $returnArray[$dataKey] = false;
                         }
                         break;
-                    case 'num':
                     case 'year':
                         $returnArray[$dataKey] = filter_var($value, FILTER_VALIDATE_INT);
                         break;
                     case 'email':
                         $returnArray[$dataKey] = filter_var($value, FILTER_VALIDATE_EMAIL);
-                        break;
-                    case 'bool':
-                        if ($value == '1') {
-                            $returnArray[$dataKey] = true;
-                        } else {
-                            $returnArray[$dataKey] = false;
-                        }
                         break;
                     default:
                         if ($value != "") {
@@ -313,7 +313,7 @@ class formHandler
 
             }
 
-            $key             = explode('-', $key);
+            $key = explode('-', $key);
             $result[$key[1]] = $output;
         }
 
@@ -321,9 +321,7 @@ class formHandler
     }
 
     /**
-     * Végignyálazza a $_POST-ban található adatokat és mező típusnak megfelelően ellenőrzi a tartalmakat
-     * Miután végzett kiüríti a $_POST-ot
-     *
+     * Takes the items in the $_POST and sanitizes them based on expected values per input type
      * @param null|array $data
      * @return array
      */
@@ -337,45 +335,38 @@ class formHandler
 
         $returnArray = array();
 
-        foreach ($rawData AS $rawKey => $data) {
+        foreach ($rawData AS $rawKey => $rawValue) {
             $dataTypeAndKey = explode('-', $rawKey);
 
-            if (isset($dataTypeAndKey[1])) {
-                $dataType = $dataTypeAndKey[0];
-                $dataKey  = $dataTypeAndKey[1];
+            if (count($dataTypeAndKey)==3) {
+
+                $dataType = $dataTypeAndKey[0] . '-' . $dataTypeAndKey[1];
+                $dataKey = $dataTypeAndKey[2];
+
             } else {
-                $dataType = $dataTypeAndKey[0];
-                $dataKey  = $dataTypeAndKey[0];
+                if (isset($dataTypeAndKey[1])) {
+                    $dataType = $dataTypeAndKey[0];
+                    $dataKey = $dataTypeAndKey[1];
+                } else {
+                    $dataType = $dataTypeAndKey[0];
+                    $dataKey = $dataTypeAndKey[0];
+                }
             }
 
 
             if ($dataType != 'submit') {
                 switch ($dataType) {
                     case 'textarea':
-                        $returnArray[$dataType . '-' . $dataKey] = $this->cleanTextField($data);
+                        $returnArray[$dataType . '-' . $dataKey] = $this->cleanTextField($rawValue);
                         break;
                     case 'email':
-                        $returnArray[$dataType . '-' . $dataKey] = filter_var($data, FILTER_SANITIZE_EMAIL);
-                        break;
-                    case 'num':
-                        $returnArray[$dataType . '-' . $dataKey] = filter_var($data, FILTER_SANITIZE_NUMBER_INT);
-                        break;
-                    case 'year':
-                        $returnArray[$dataType . '-' . $dataKey] = filter_var($data, FILTER_SANITIZE_NUMBER_INT);
-                        break;
-                    case 'phone':
-                        $sanitize                                = filter_var($data, FILTER_SANITIZE_NUMBER_INT);
-                        $sanitize                                = str_replace(array('+', '-', '/'), '', $sanitize);
-                        $returnArray[$dataType . '-' . $dataKey] = $sanitize;
-                        break;
-                    case 'checklist':
-                        $returnArray[$dataType . '-' . $dataKey] = $data;
+                        $returnArray[$dataType . '-' . $dataKey] = filter_var($rawValue, FILTER_SANITIZE_EMAIL);
                         break;
                     default:
-                        if (is_array($data)) {
-                            $returnArray[$dataType . '-' . $dataKey] = $data;
+                        if (is_array($rawValue)) {
+                            $returnArray[$dataType . '-' . $dataKey] = $rawValue;
                         } else {
-                            $returnArray[$dataType . '-' . $dataKey] = $this->cleanVar($data);
+                            $returnArray[$dataType . '-' . $dataKey] = $this->cleanVar($rawValue);
                         }
                         break;
                 }
@@ -397,10 +388,9 @@ class formHandler
      * @deprecated revision needed
      *
      * @param null $dataArray
-     * @param bool $editForm Ha true akkor a passWord1 és passWord2 kulcsokra nem vonatkoznak a szabályok
      * @return bool
      */
-    public function checkForErrors($dataArray = null, $editForm = false)
+    public function checkForErrors($dataArray = null)
     {
         if (is_array($dataArray)) {
 
@@ -410,26 +400,8 @@ class formHandler
 
                 if ($value === false) {
 
-                    if (!$editForm) {
 
-                        if (isset($_SESSION['lastFormInputs'][$key])) {
-                            $name = $_SESSION['lastFormInputs'][$key];
-                        } else {
-                            $name = $key;
-                        }
 
-                        $valid = false;
-                    } else {
-                        if ($key != 'passWord1' AND $key != 'passWord2') {
-                            if (isset($_SESSION['lastFormInputs'][$key])) {
-                                $name = $_SESSION['lastFormInputs'][$key];
-                            } else {
-                                $name = $key;
-                            }
-
-                            $valid = false;
-                        }
-                    }
                 }
             }
 
@@ -445,7 +417,7 @@ class formHandler
 
     /**
      *
-     * Add an input to a yet to be created form
+     * Add an input to a yet to be created form, also watch for values in the $_SESSION['postBack']
      *
      *
      * @param string $inputType
@@ -457,13 +429,13 @@ class formHandler
 
         $input['type'] = $inputType;
         $input['name'] = $inputType . '-' . $inputName;
-        $input['id']   = $input['name'];
+        $input['id'] = $input['name'];
 
         $input['value'] = (isset($attributes['value']) ? $attributes['value'] : null);
         $input['label'] = (isset($attributes['label']) ? $attributes['label'] : null);
 
 
-        if ($inputType != 'dropdownList' AND $inputType != 'checkBox') {
+        if (in_array($inputType,array('select','checkbox','radio','checkbox-inline','radio-inline'))) {
             $input['value'] = (isset($_SESSION['postBack'][$inputName]) ? $_SESSION['postBack'][$inputName] : $input['value']);
         }
 
@@ -495,6 +467,7 @@ class formHandler
     }
 
     /**
+     * Parses through the attributes of input element, and decides which to use/to ignore
      * @param array $attributes
      * @return string
      */
@@ -505,13 +478,13 @@ class formHandler
 
         $ignoreValueTypes = array('select', 'textarea');
 
-        $ignoreButtons = array('button', 'submit', 'reset');
+        $ignoredTypes = array('button', 'submit', 'reset', 'checkbox', 'checkbox-inline', 'radio', 'radio-inline');
 
         if (in_array($attributes['type'], $ignoreValueTypes)) {
             $ignoredAttributes[] = 'value';
         }
 
-        if (!isset($attributes['class']) AND !in_array($attributes['type'], $ignoreButtons)) {
+        if (!isset($attributes['class']) AND !in_array($attributes['type'], $ignoredTypes)) {
             $attributes['class'] = 'form-control';
         }
 
@@ -533,9 +506,9 @@ class formHandler
                         /*
                          * check the class section for the form-control class, and if missing, add it
                          */
-                        if (!$this->hasCSSClass('form-control', $v) AND !in_array($attributes['type'], $ignoreButtons)) {
+                        if (!$this->hasCSSClass('form-control', $v) AND !in_array($attributes['type'], $ignoredTypes)) {
                             $v = 'form-control ' . $v;
-                        } elseif (!$this->hasCSSClass('btn', $v) AND in_array($attributes['type'], $ignoreButtons)) {
+                        } elseif (!$this->hasCSSClass('btn', $v) AND in_array($attributes['type'], $ignoredTypes)) {
                             $v = 'btn ' . $v;
                         }
 
@@ -585,6 +558,9 @@ class formHandler
          */
         if (!is_null($elementData['label']) || $this->formLayout == _BOOTFORMER_LAYOUT_HORIZONTAL) {
 
+            /*
+             * Add a label if missing ant the layout is horizontal
+             */
             if ($this->formLayout == _BOOTFORMER_LAYOUT_HORIZONTAL AND !in_array($elementData['type'], array('button', 'reset', 'submit'))) {
                 if (is_null($elementData['label'])) {
                     $elementData['label'] = 'MISSING';
@@ -613,10 +589,6 @@ class formHandler
                 break;
             case 'select':
                 $r .= $this->renderSelectOption($elementData);
-                break;
-            case 'checkbox':
-                break;
-            case 'radio':
                 break;
             case 'textarea':
                 $r .= $this->renderTextArea($elementData);
@@ -648,6 +620,112 @@ class formHandler
         $r .= '</div> <!-- end input group -->' . "\r\n";
 
         return $r;
+    }
+
+    /**
+     * Alternative to the generalElement, this handles the checkbox and radio elements
+     */
+    private function selectorElement($elementData = array())
+    {
+        $ratio = explode(':', $this->formRatio);
+
+        /*
+         * Create general form group
+         */
+        $r = '<div class="form-group">';
+
+
+        /*
+         * If the label is set, add it with no regard for stacked inputs...
+         */
+        if (!is_null($elementData['label']) || $this->formLayout == _BOOTFORMER_LAYOUT_HORIZONTAL) {
+
+            /*
+             * Add a label if missing ant the layout is horizontal
+             */
+            if ($this->formLayout == _BOOTFORMER_LAYOUT_HORIZONTAL AND !in_array($elementData['type'], array('radio', 'checkbox'))) {
+                if (is_null($elementData['label'])) {
+                    $elementData['label'] = 'MISSING';
+                }
+            }
+
+            $classAdd = null;
+
+            if ($this->formLayout == _BOOTFORMER_LAYOUT_HORIZONTAL) {
+                $classAdd = 'col-sm-' . $ratio[0] . ' control-label';
+            }
+
+            if ($this->formLayout == _BOOTFORMER_LAYOUT_HORIZONTAL AND !in_array($elementData['type'], array('radio', 'checkbox'))) {
+                $r .= '<label ' . (!is_null($classAdd) ? 'class="' . $classAdd . '"' : '') . '>' . $elementData['label'] . '</label>' . "\r\n";
+            }
+        }
+
+        if ($this->formLayout == _BOOTFORMER_LAYOUT_HORIZONTAL) {
+            $r .= '<div class="col-sm-' . $ratio[1] . '">' . "\r\n";
+        }
+
+        /*
+         * This is the fun part, the general input type is in the default branch
+         */
+        switch ($elementData['type']) {
+            case 'radio':
+            case 'checkbox':
+                $r .= $this->renderSelector($elementData);
+                break;
+            case 'radio-inline':
+            case 'checkbox-inline':
+                $r .= $this->renderInlineSelector($elementData);
+                break;
+        }
+
+        if ($this->formLayout == _BOOTFORMER_LAYOUT_HORIZONTAL) {
+            $r .= '</div> <!-- end ratio -->' . "\r\n";
+        }
+
+        $r .= '</div> <!-- end input group -->' . "\r\n";
+
+        return $r;
+    }
+
+    function renderSelector($element = array())
+    {
+        $r = '
+<div class="' . $element['type'] . '">
+  <label>
+    <input type="' . $element['type'] . '" ' . $this->parseAttributes($element) . '>
+    ' . $element['label'] . '
+        </label>
+</div>
+        ';
+
+        return $r;
+    }
+
+    function renderInlineSelector($element = array())
+    {
+
+        if (isset($element['value']) && is_array($element['value'])) {
+
+            $r = null;
+
+            $simpleType = explode('-', $element['type']);
+
+            foreach ($element['value'] AS $v) {
+
+                $v['name'] = $element['name'];
+                $v['type'] = $element['type'];
+
+                $r .= '<label class="' . $element['type'] . '">';
+                $r .= '<input type="' . $simpleType[0] . '" ' . $this->parseAttributes($v) . '>';
+                $r .= $v['label'];
+                $r .= '</label>';
+            }
+
+            return $r;
+
+        } else {
+            return '<p>Empty inline element</p>';
+        }
     }
 
     /**
@@ -727,12 +805,10 @@ class formHandler
      * Generate the form, based on the already added inputs
      *
      * @param string $formName
-     * @param string $submitText
-     * @param string $submitAdd Addition code to place next to the Submit button (eg. cancel, reset, ...)
      *
      * @return bool|string
      */
-    public function generateForm($formName = null, $submitText = null, $submitAdd = null)
+    public function generateForm($formName = null)
     {
         if (is_array($this->elements)) {
 
@@ -747,9 +823,13 @@ class formHandler
 
             foreach ($this->elements AS $formElement) {
 
-                var_dump($formElement);
-
-                $rows .= $this->generalInputElement($formElement);
+                if (in_array($formElement['type'], array('checkbox', 'radio', 'checkbox-inline', 'radio-inline'))) {
+                    $rows .= $this->selectorElement($formElement);
+                } elseif ($formElement['type'] == 'custom' && isset($formElement['value'])) {
+                    $rows .= $formElement['value'];
+                } else {
+                    $rows .= $this->generalInputElement($formElement);
+                }
 
             }
 

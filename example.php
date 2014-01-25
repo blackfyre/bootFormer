@@ -6,37 +6,53 @@
  * Time: 13:20
  */
 
+session_start();
+
 include 'classes/form.php';
 
-function formExample() {
+
     $form = new blackfyre\bootFormer\formHandler();
 
     $_SESSION['postBack']['textInput1'] = 'nincs';
+    $_SESSION['postBack']['checkBoxes[]'] = 2;
 
     $form->setFormLayout(_BOOTFORMER_LAYOUT_NORMAL);
 
-    $form->addInput('text','textInput1',array('required'=>true));
-    $form->addInput('text','textInput2',array('required'=>true,'label'=>'nincs'));
-    $form->addInput('text','textInput3',array('required'=>true,'label'=>'nincs','value'=>'no content'));
-    $form->addInput('text','textInput4',array('required'=>true,'label'=>'nincs','placeholder'=>'_PLACEHOLDER'));
-    $form->addInput('text','textInput5',array('required'=>true,'placeholder'=>'_PLACEHOLDER','leftCombo'=>'_LEFT','rightCombo'=>'_RIGHT'));
+    $form->addInput('text','textInput1');
+    $form->addInput('text','textInput2',array('label'=>'nincs'));
+    $form->addInput('text','textInput3',array('label'=>'nincs','value'=>'no content'));
+    $form->addInput('text','textInput4',array('label'=>'nincs','placeholder'=>'_PLACEHOLDER'));
+    $form->addInput('text','textInput5',array('placeholder'=>'_PLACEHOLDER','leftCombo'=>'_LEFT','rightCombo'=>'_RIGHT'));
 
-    $selectValues[] = 1;
-    $selectValues[] = 2;
-    $selectValues[] = 3;
-    $selectValues[] = 4;
+    $selectValues[1] = 1;
+    $selectValues[2] = 2;
+    $selectValues[3] = 3;
+    $selectValues[4] = 4;
 
     $form->addInput('select','select1',array('value'=>$selectValues));
-    $form->addInput('select','select2',array('value'=>$selectValues,'multiple'=>true));
+    $form->addInput('select','select2[]',array('value'=>$selectValues,'multiple'=>true));
 
     $form->addInput('textarea','textArea1');
     $form->addInput('textarea','textArea1',array('value'=>'_DEMO_CONTENT'));
 
+    $form->addInput('checkbox','checkBox1',array('value'=>'_DEMO_CONTENT','label'=>'Check this label'));
+
+    $form->addInput('radio','radioDemo',array('value'=>1,'label'=>'Radio option 1'));
+    $form->addInput('radio','radioDemo',array('value'=>2,'label'=>'Radio option 2'));
+
+    $inlineElements[] = array('value'=>'1','label'=>'1');
+    $inlineElements[] = array('value'=>'2','label'=>'2');
+    $inlineElements[] = array('value'=>'3','label'=>'3');
+
+    $form->addInput('checkbox-inline','checkBoxes[]',array('value'=>$inlineElements));
+
+    $form->addInput('radio-inline','radioOptions[]',array('value'=>$inlineElements));
+
     $form->addInput('button','btn1',array('class'=>'btn-default','value'=>'BUTTON'));
     $form->addInput('submit','btn2',array('value'=>'SUBMIT'));
 
-    return $form->generateForm();
-}
+
+
 
 ?>
 
@@ -69,12 +85,27 @@ function formExample() {
 <div class="container">
     <div class="row">
         <div class="col-xs-6">
-            <?php echo formExample(); ?>
+            <?php echo $form->generateForm();
+
+
+
+            ?>
+
+
+
         </div>
         <div class="col-xs-6">
             <pre>
 <?php print_r($_SESSION) ?>
             </pre>
+
+            <?php
+            if (isset($_POST['submit-btn2'])) {
+                echo '<hr>';
+                var_dump($form->validator());
+            }
+            ?>
+
         </div>
     </div>
 
