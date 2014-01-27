@@ -730,6 +730,28 @@ class formHandler
 
     /**
      * @param array $element
+     * @return mixed
+     */
+    function elementNameOnly($element = array()) {
+
+        $name = explode('-',$element['name']);
+
+        switch (count($name)) {
+            case 2:
+                return $name[1];
+                break;
+            case 3:
+                return $name[2];
+                break;
+            default:
+                return $element['name'];
+                break;
+        }
+
+    }
+
+    /**
+     * @param array $element
      * @return null|string
      */
     function renderSelectOption($element = array())
@@ -738,9 +760,14 @@ class formHandler
             return null;
         }
 
+        $name = $this->elementNameOnly($element);
+
+        var_dump($name);
+
         $r = '<select ' . $this->parseAttributes($element) . '>';
 
         foreach ($element['value'] AS $k => $v) {
+
 
             if (is_array($v)) {
 
@@ -751,7 +778,16 @@ class formHandler
                 }
 
             } else {
-                $r .= '<option value="' . $k . '">' . $v . '</option>';
+
+                $selected = '';
+
+                if (isset($_SESSION['postBack'][$name])) {
+                    if ($_SESSION['postBack'][$name] == $k) {
+                        $selected = 'selected';
+                    }
+                }
+
+                $r .= '<option ' . $selected . ' value="' . $k . '">' . $v . '</option>';
             }
 
 

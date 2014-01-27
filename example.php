@@ -16,6 +16,8 @@ include 'classes/form.php';
     $_SESSION['postBack']['textInput1'] = 'nincs';
     $_SESSION['postBack']['checkBoxes[]'] = 2;
 
+    $_SESSION['postBack']['select1'] = 2;
+
     $form->setFormLayout(_BOOTFORMER_LAYOUT_NORMAL);
 
     $form->addInput('text','textInput1');
@@ -28,6 +30,12 @@ include 'classes/form.php';
     $selectValues[2] = 2;
     $selectValues[3] = 3;
     $selectValues[4] = 4;
+
+    $selectValues[]['names'] = array(
+        5=>5,
+        6=>6,
+        7=>7,
+    );
 
     $form->addInput('select','select1',array('value'=>$selectValues));
     $form->addInput('select','select2[]',array('value'=>$selectValues,'multiple'=>true));
