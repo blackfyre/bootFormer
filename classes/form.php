@@ -435,7 +435,7 @@ class formHandler
         $input['label'] = (isset($attributes['label']) ? $attributes['label'] : null);
 
 
-        if (in_array($inputType,array('select','checkbox','radio','checkbox-inline','radio-inline'))) {
+        if (!in_array($inputType,array('select','checkbox','radio','checkbox-inline','radio-inline'))) {
             $input['value'] = (isset($_SESSION['postBack'][$inputName]) ? $_SESSION['postBack'][$inputName] : $input['value']);
         }
 
