@@ -31,7 +31,7 @@ include 'classes/form.php';
     $selectValues[3] = 3;
     $selectValues[4] = 4;
 
-    $selectValues[]['names'] = array(
+    $selectValues['names'] = array(
         5=>5,
         6=>6,
         7=>7,

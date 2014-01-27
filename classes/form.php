@@ -768,24 +768,28 @@ class formHandler
 
         foreach ($element['value'] AS $k => $v) {
 
+            $selected = '';
+
+            if (isset($_SESSION['postBack'][$name])) {
+                if ($_SESSION['postBack'][$name] == $k) {
+                    $selected = 'selected';
+                }
+            }
+
 
             if (is_array($v)) {
 
-                $r .= '<optgroup>' . $k . '</optgroup>';
+                $r .= '<optgroup label="' . $k . '">';
 
                 foreach ($v as $optKey => $optVal) {
-                    $r .= '<option value="' . $optKey . '">' . $optVal . '</option>';
+                    $r .= '<option ' . $selected . ' value="' . $optKey . '">' . $optVal . '</option>';
                 }
+
+                $r .= '</optgroup>';
 
             } else {
 
-                $selected = '';
 
-                if (isset($_SESSION['postBack'][$name])) {
-                    if ($_SESSION['postBack'][$name] == $k) {
-                        $selected = 'selected';
-                    }
-                }
 
                 $r .= '<option ' . $selected . ' value="' . $k . '">' . $v . '</option>';
             }
