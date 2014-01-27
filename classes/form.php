@@ -762,8 +762,6 @@ class formHandler
 
         $name = $this->elementNameOnly($element);
 
-        var_dump($name);
-
         $r = '<select ' . $this->parseAttributes($element) . '>';
 
         foreach ($element['value'] AS $k => $v) {
